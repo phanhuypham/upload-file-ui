@@ -1,20 +1,22 @@
+import axios from "axios";
 import http from "../http-common";
 
-const upload = (file, onUploadProgress) => {
+const upload = async (signURL, file, onUploadProgress) => {
   let formData = new FormData();
 
   formData.append("file", file);
 
-  return http.post("/upload", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-    onUploadProgress,
+  const response = await axios.put(signURL, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
+  console.log(response);
 };
 
-const getFiles = () => {
-  return http.get("/files");
+const getURL = async (fileName) => {
+  const response = await http.get(`/get-url?key=${fileName}`);
+  console.log(response)
+  const signURL = response.data;
+  return signURL;
 };
 
 const health = () => {
@@ -23,8 +25,8 @@ const health = () => {
 
 const FileUploadService = {
   upload,
-  getFiles,
-  health
+  getURL,
+  health,
 };
 
 export default FileUploadService;

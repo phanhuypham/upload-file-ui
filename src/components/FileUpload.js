@@ -7,15 +7,11 @@ const UploadFiles = () => {
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
   const [fileInfos, setFileInfos] = useState([]);
-
-  // useEffect(() => {
-  //   UploadService.getFiles().then((response) => {
-  //     setFileInfos(response.data);
-  //   });
-  // }, []);
+  const [signURL, setSignURL] = useState("");
 
   const selectFile = (event) => {
     setSelectedFiles(event.target.files);
+    getSignURL(event.target.files[0].name);
   };
 
   const upload = () => {
@@ -24,7 +20,7 @@ const UploadFiles = () => {
     setProgress(0);
     setCurrentFile(currentFile);
 
-    UploadService.upload(currentFile, (event) => {
+    UploadService.upload(signURL, currentFile, (event) => {
       setProgress(Math.round((100 * event.loaded) / event.total));
     })
       .then((response) => {
@@ -43,6 +39,11 @@ const UploadFiles = () => {
     setSelectedFiles(undefined);
   };
 
+  const getSignURL = async (fileName) => {
+    const newSignURL = await UploadService.getURL(fileName);
+    console.log(newSignURL);
+    setSignURL(newSignURL);
+  };
   return (
     <div>
       {currentFile && (
@@ -66,27 +67,22 @@ const UploadFiles = () => {
 
       <button
         className="btn btn-success"
-        disabled={!selectedFiles}
+        disabled={!selectedFiles || !signURL}
         onClick={upload}
       >
-        Upload
+       (ノಠ益ಠ)ノ彡Upload 
       </button>
 
-      <div className="alert alert-light" role="alert">
-        {message}
-      </div>
+      {/* <button
+        className="btn btn-success"
+        onClick={getSignURL}
+      >
+        Get URL
+      </button> */}
 
-      {/* <div className="card">
-        <div className="card-header">List of Files</div>
-        <ul className="list-group list-group-flush">
-          {fileInfos &&
-            fileInfos.map((file, index) => (
-              <li className="list-group-item" key={index}>
-                <a href={file.url}>{file.name}</a>
-              </li>
-            ))}
-        </ul>
-      </div> */}
+      <div className="alert alert-light" role="alert">
+        {signURL ? "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ URL:" : ""} {signURL}
+      </div>
     </div>
   );
 };
